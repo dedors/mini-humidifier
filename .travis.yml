@@ -16,5 +16,5 @@ deploy:
   release_notes_file: release_notes/${TRAVIS_TAG}.md
   overwrite: true
   on:
-    repo: artem-sedykh/mini-humidifier
+    repo: dedors/mini-humidifier
     tags: true
