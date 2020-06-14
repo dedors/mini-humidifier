@@ -49,7 +49,7 @@ const DEERMA_HUMIDIFIER_MJJSQ = () => ({
       icon: ICON.TANK,
       order: 3,
       source: { attribute: 'no_water', mapper: '(val) => (val ? "Empty" : "Not Empty")' },
-      unit: ''
+      unit: '',
     },
   },
   buttons: {
