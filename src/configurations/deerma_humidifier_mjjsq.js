@@ -77,13 +77,13 @@ const DEERMA_HUMIDIFIER_MJJSQ = () => ({
     },
     led: {
       icon: ICON.LEDBUTTON,
-      type: 'dropdown',
+      type: 'toggle',
       hide: false,
       order: 2,
       active: state => (state !== 2 && state !== '2'),
       source: { true: 'On', false: 'Off' },
       state: { attribute: 'led', mapper: state => (state ? 'on' : 'off') },
-      change_action: (state, entity) => {
+      toggle_action: (state, entity) => {
         const service = state === 'on' ? 'xiaomi_miio_set_led_off' : 'xiaomi_miio_set_led_on';
         const options = { entity_id: entity.entity_id };
         return this.call_service('fan', service, options);
