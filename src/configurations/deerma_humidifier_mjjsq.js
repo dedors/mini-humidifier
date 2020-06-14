@@ -16,32 +16,18 @@ const DEERMA_HUMIDIFIER_MJJSQ = () => ({
     unit: '%',
     min: 30,
     max: 80,
-    step: 10,
+    step: 1,
     hide: false,
     hide_indicator: false,
     state: { attribute: 'target_humidity' },
     change_action: (selected, state, entity) => {
       const options = { entity_id: entity.entity_id, humidity: selected };
-      return this.call_service('xiaomi_miio', 'fan_set_target_humidity', options);
+      return this.call_service('fan', 'xiaomi_miio_set_target_humidity', options);
     },
   },
   indicators: {
     depth: {
-      icon: ICON.DEPTH,
-      unit: '%',
-      round: 0,
-      order: 0,
-      max_value: 125,
-      volume: 4,
-      type: 'percent',
-      hide: false,
-      source: {
-        attribute: 'depth',
-        mapper: (val) => {
-          const value = (100 * (val || 0)) / this.max_value;
-          return this.type === 'liters' ? (value * this.volume) / 100 : value;
-        },
-      },
+      hide: true,
     },
     temperature: {
       icon: ICON.TEMPERATURE,
@@ -59,18 +45,15 @@ const DEERMA_HUMIDIFIER_MJJSQ = () => ({
       hide: false,
       source: { attribute: 'humidity' },
     },
+    status: {
+      icon: ICON.TANK,
+      order: 3,
+      source: { attribute: 'no_water', mapper: '(val) => (val ? "Empty" : "Not Empty")' },
+      unit: ''    
   },
   buttons: {
     dry: {
-      icon: ICON.DRY,
-      hide: false,
-      order: 0,
-      state: { attribute: 'dry', mapper: state => (state ? 'on' : 'off') },
-      toggle_action: (state, entity) => {
-        const service = state === 'on' ? 'fan_set_dry_off' : 'fan_set_dry_on';
-        const options = { entity_id: entity.entity_id };
-        return this.call_service('xiaomi_miio', service, options);
-      },
+      hide: true,
     },
     mode: {
       icon: ICON.FAN,
@@ -78,10 +61,10 @@ const DEERMA_HUMIDIFIER_MJJSQ = () => ({
       hide: false,
       order: 1,
       source: {
-        auto: 'auto',
-        silent: 'silent',
-        medium: 'medium',
-        high: 'high',
+      humidity: 'auto',
+      low: 'low',
+      medium: 'medium',
+      high: 'high',
       },
       active: (state, entity) => (entity.state !== 'off'),
       disabled: (state, entity) => (entity.attributes.depth === 0),
@@ -97,11 +80,12 @@ const DEERMA_HUMIDIFIER_MJJSQ = () => ({
       hide: false,
       order: 2,
       active: state => (state !== 2 && state !== '2'),
-      source: { 0: 'Bright', 1: 'Dim', 2: 'Off' },
-      state: { attribute: 'led_brightness' },
-      change_action: (selected, state, entity) => {
-        const options = { entity_id: entity.entity_id, brightness: selected };
-        return this.call_service('xiaomi_miio', 'fan_set_led_brightness', options);
+      source: { true: 'On', false: 'Off' },
+      state: { attribute: 'led', mapper: state => (state ? 'on' : 'off') },
+      change_action: (state, entity) => {
+        const service = state === 'on' ? 'xiaomi_miio_set_led_off' : 'xiaomi_miio_set_led_on';
+        const options = { entity_id: entity.entity_id };
+        return this.call_service('fan', service, options);
       },
     },
     buzzer: {
@@ -110,23 +94,16 @@ const DEERMA_HUMIDIFIER_MJJSQ = () => ({
       order: 3,
       state: { attribute: 'buzzer', mapper: state => (state ? 'on' : 'off') },
       toggle_action: (state, entity) => {
-        const service = state === 'on' ? 'fan_set_buzzer_off' : 'fan_set_buzzer_on';
+        const service = state === 'on' ? 'xiaomi_miio_set_buzzer_off' : 'xiaomi_miio_set_buzzer_on';
         const options = { entity_id: entity.entity_id };
-        return this.call_service('xiaomi_miio', service, options);
+        return this.call_service('fan', service, options);
       },
     },
     child_lock: {
-      icon: ICON.CHILDLOCK,
-      hide: false,
+      hide: true,
       order: 4,
-      state: { attribute: 'child_lock', mapper: state => (state ? 'on' : 'off') },
-      toggle_action: (state, entity) => {
-        const service = state === 'on' ? 'fan_set_child_lock_off' : 'fan_set_child_lock_on';
-        const options = { entity_id: entity.entity_id };
-        return this.call_service('xiaomi_miio', service, options);
-      },
     },
   },
 });
 
-export default ZHIMI_HUMIDIFIER_CB1;
+export default DEERMA_HUMIDIFIER_MJJSQ;
